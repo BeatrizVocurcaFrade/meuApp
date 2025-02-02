@@ -51,8 +51,110 @@ Vamos para o *$placeA* no dia *${formattedDate(dateA)}* e às *${timeA.format(co
   await launchUrlString('$link', mode: LaunchMode.externalApplication);
 }
 
+class MemoryCarousel extends StatefulWidget {
+  const MemoryCarousel({super.key});
+
+  @override
+  State<MemoryCarousel> createState() => _MemoryCarouselState();
+}
+
+class Memoria {
+  String image;
+  String message;
+  String url;
+  bool isDownload;
+  bool isNetwork;
+  Memoria.image(
+      {required this.image,
+      required this.message,
+      this.url = '',
+      this.isNetwork = false,
+      this.isDownload = false});
+}
+
+var memorias = [
+  Memoria.image(
+      image: 'assets/eu1.jpeg', message: "Já imaginar um date nosso..."),
+  Memoria.image(
+      image: 'assets/eu2.jpeg', message: "Malho p ficar bonita no date"),
+  Memoria.image(image: 'assets/eu3.jpeg', message: ""),
+  Memoria.image(image: 'assets/eu4.jpeg', message: ""),
+  Memoria.image(image: 'assets/eu5.jpeg', message: ""),
+];
+
+class _MemoryCarouselState extends State<MemoryCarousel> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          PageView.builder(
+            itemCount: memorias.length,
+            itemBuilder: (context, index) {
+              final memory = memorias[index];
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.asset(
+                    memory.image,
+                    fit: BoxFit.cover,
+                  ),
+                  Container(
+                    color: Colors.black.withValues(alpha: 0.5),
+                  ),
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        memory.message,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black,
+                              blurRadius: 10,
+                              offset: Offset(2, 2),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+          Positioned(
+            top: 40,
+            left: 16,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _InviteHomePageState extends State<InviteHomePage> {
-  final String girlName = 'Fulana'; // Nome dela
+  final String girlName = 'Duda'; // Nome dela
   final String photoPath = 'assets/Sample3.jpeg'; // Foto dela
   final List<String> places = [
     'Bar',
@@ -169,11 +271,43 @@ class _InviteHomePageState extends State<InviteHomePage> {
                 },
               ),
             ),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const MemoryCarousel()),
+                );
+              },
+              child: buildSectionHeader('Fotos minhas p vc n me achar maluca'),
+            ),
           ],
         ),
       ),
     );
   }
+}
+
+Widget buildSectionHeader(String title) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFFB39DDB),
+            ),
+          ),
+        ),
+        Icon(Icons.arrow_forward_ios_outlined)
+      ],
+    ),
+  );
 }
 
 // Tela de sucesso após marcar o encontro
