@@ -77,6 +77,15 @@ class _InviteHomePageState extends State<InviteHomePage> {
         ),
         backgroundColor: const Color(0xFFB39DDB),
       ),
+      floatingActionButton: ElevatedButton.icon(
+          label: Text("Sobre mim"),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const MemoryCarousel()),
+            );
+          },
+          icon: Icon(Icons.info)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -119,16 +128,6 @@ class _InviteHomePageState extends State<InviteHomePage> {
                   return buildPlaceCard(context, places[index]);
                 },
               ),
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const MemoryCarousel()),
-                );
-              },
-              child: buildSectionHeader('Fotos minhas p vc n me achar maluca'),
             ),
           ],
         ),
@@ -296,13 +295,6 @@ class SuccessScreen extends StatelessWidget {
   }
 }
 
-class MemoryCarousel extends StatefulWidget {
-  const MemoryCarousel({super.key});
-
-  @override
-  State<MemoryCarousel> createState() => _MemoryCarouselState();
-}
-
 class Memoria {
   String image;
   String message;
@@ -318,23 +310,58 @@ class Memoria {
 }
 
 var memorias = [
+  // Sobre Mim
   Memoria.image(
-      image: 'assets/eu1.jpeg', message: "Já imaginar um date nosso..."),
+    image: 'assets/eu1.jpeg',
+    message:
+        "Sou de BH e, como vc pode imaginar, trabalho desenvolvendo aplicativos...",
+  ),
   Memoria.image(
-      image: 'assets/eu2.jpeg', message: "Malho p ficar bonita no date"),
-  Memoria.image(image: 'assets/eu3.jpeg', message: ""),
-  Memoria.image(image: 'assets/eu4.jpeg', message: ""),
-  Memoria.image(image: 'assets/eu5.jpeg', message: ""),
+    image: 'assets/eu3.jpeg',
+    message:
+        "Tenho 22 anos e nunca namorei, ou seja, n tenho histórico complicado...",
+  ),
+  Memoria.image(
+    image: 'assets/eu2.jpeg',
+    message: "Sou lésbica e assumida para toda a minha família...",
+  ),
+
+  // Motivação para o Date
+  Memoria.image(
+    image: 'assets/eu4.jpeg',
+    message:
+        "Quero apenas fazer um date. Desenvolvi este app porque imaginei que teria mais chances de vc responder...",
+  ),
+  Memoria.image(
+    image: 'assets/eu5.jpeg',
+    message: "Acho que vc deveria aceitar o convite só pela história...",
+  ),
 ];
 
+class MemoryCarousel extends StatefulWidget {
+  const MemoryCarousel({super.key});
+
+  @override
+  State<MemoryCarousel> createState() => _MemoryCarouselState();
+}
+
 class _MemoryCarouselState extends State<MemoryCarousel> {
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+
   @override
   void initState() {
     super.initState();
+    _pageController.addListener(() {
+      setState(() {
+        _currentPage = _pageController.page?.round() ?? 0;
+      });
+    });
   }
 
   @override
   void dispose() {
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -343,41 +370,47 @@ class _MemoryCarouselState extends State<MemoryCarousel> {
     return Scaffold(
       body: Stack(
         children: [
+          // Carrossel de fotos
           PageView.builder(
+            controller: _pageController,
             itemCount: memorias.length,
             itemBuilder: (context, index) {
               final memory = memorias[index];
               return Stack(
                 fit: StackFit.expand,
                 children: [
+                  // Imagem de fundo
                   Image.asset(
                     memory.image,
                     fit: BoxFit.cover,
                   ),
+                  // Overlay escuro para melhorar a legibilidade do texto
                   Container(
-                    color: Colors.black.withValues(alpha: 0.5),
+                    color: Colors.black.withOpacity(0.4),
                   ),
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        memory.message,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          shadows: [
-                            Shadow(
-                              color: Colors.black,
-                              blurRadius: 10,
-                              offset: Offset(2, 2),
-                            ),
-                          ],
+                  // Mensagem centralizada (se existir)
+                  if (memory.message.isNotEmpty)
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          memory.message,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black,
+                                blurRadius: 10,
+                                offset: Offset(2, 2),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
                 ],
               );
             },
@@ -386,10 +419,33 @@ class _MemoryCarouselState extends State<MemoryCarousel> {
             top: 40,
             left: 16,
             child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              icon: const Icon(Icons.arrow_back, color: Colors.white, size: 30),
               onPressed: () {
                 Navigator.pop(context);
               },
+            ),
+          ),
+
+          Positioned(
+            bottom: 20,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                memorias.length,
+                (index) => Container(
+                  width: 8,
+                  height: 8,
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _currentPage == index
+                        ? Colors.white
+                        : Colors.white.withOpacity(0.5),
+                  ),
+                ),
+              ),
             ),
           ),
         ],
