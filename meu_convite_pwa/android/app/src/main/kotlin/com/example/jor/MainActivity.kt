@@ -1,4 +1,4 @@
-package com.example.meu_convite_pwa
+package com.example.meu_convite_pwa_app
 
 import io.flutter.embedding.android.FlutterActivity
 
